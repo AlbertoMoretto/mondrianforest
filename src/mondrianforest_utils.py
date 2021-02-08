@@ -10,6 +10,7 @@ import numpy as np
 import random
 from itertools import izip
 import scipy.io
+import pandas as pd
 from warnings import warn
 try:
     from scipy.special import gammaln, digamma
@@ -225,7 +226,7 @@ def check_dataset(settings):
             or settings.dataset[:6] == 'houses' or settings.dataset[:9] == 'halfmoons' \
             or settings.dataset[:3] == 'sim' or settings.dataset == 'navada' \
             or settings.dataset[:3] == 'msg' or settings.dataset[:14] == 'airline-delays' \
-            or settings.dataset == 'branin'
+            or settings.dataset == 'branin' or settings.dataset[:5] == 'unary'
     if not special_cases:
         try:
             if settings.optype == 'class':
@@ -247,6 +248,8 @@ def load_data(settings):
                 settings.dataset + '.p', "rb"))
     elif settings.dataset == 'toy-mf':
         data = load_toy_mf_data()
+    elif settings.dataset == 'unary-feat':
+        data = load_unary_features()
     elif settings.dataset == 'msg-4dim':
         data = load_msg_data()
     elif settings.dataset[:9] == 'halfmoons':
@@ -454,6 +457,34 @@ def load_toy_data():
     print data
     return data
  
+def load_unary_features():
+    unary_features = ['normal_angle', 'normal_deviation', 'l_CIELAB', 'a_CIELAB', 'b_CIELAB',
+                    'standard_l_CIELAB', 'standard_a_CIELAB', 'standard_b_CIELAB',
+                    'MIN_height', 'MAX_height', 'bounding_box_width', 'bounding_box_height',
+                    'bounding_box_depth', 'bounding_box_vertical_area', 'bounding_box_horizontal_area',
+                    'vertical_elongation', 'horizontal_elongation', 'volumeness']
+
+    x_df = pd.read_csv('/home/alberto/tesi/dataset/trained_semseg_data/entangled_csv/unary_csv/0000.csv', usecols=unary_features)
+    y_df = pd.read_csv('/home/alberto/tesi/dataset/trained_semseg_data/entangled_csv/labels_csv/0000.csv', dtype=int)
+
+    x_train = x_df.to_numpy()
+    y_train = y_df.to_numpy()
+    y_train.shape  = (y_train.shape[0],)
+
+    n_train = x_train.shape[0]
+    n_dim = x_train.shape[1]
+    n_labels = np.amax(y_train)+1
+
+    x_test = x_train
+    y_test = y_train
+
+    n_test = x_test.shape[0]
+
+    data = {'x_train': x_train, 'y_train': y_train, 'n_class': n_labels, \
+                'n_dim': n_dim, 'n_train': n_train, 'x_test': x_test, \
+                'y_test': y_test, 'n_test': n_test, 'is_sparse': False}
+    
+    return data
 
 def load_toy_mf_data():
     n_dim = 2

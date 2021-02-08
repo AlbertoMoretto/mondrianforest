@@ -1,8 +1,8 @@
 #!/usr/bin/env python
 
 import numpy as np
-import pprint as pp     # pretty printing module
-from matplotlib import pyplot as plt        # required only for plotting results
+import pprint as pp
+from matplotlib import pyplot as plt
 from mondrianforest_utils import load_data, reset_random_seed, precompute_minimal 
 from mondrianforest import process_command_line, MondrianForest
 
