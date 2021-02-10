@@ -6,6 +6,7 @@ from mondrianforest_utils import load_data, reset_random_seed, precompute_minima
 from mondrianforest import process_command_line, MondrianForest
 import pandas as pd
 import os
+import random
 
 def load_dataset(settings):
     ''' Import unaryfeatures and labels for dataset from csv files
@@ -27,19 +28,30 @@ def load_dataset(settings):
     # corresponding subfolders)
     uf_dir = settings.data_path + '/unary_csv'
     labels_dir = settings.data_path + '/labels_csv'
-    file_list = os.listdir(labels_dir)
 
-    first_time = True
-    for file_name in file_list:
+    # Randomly subdivies the dataset list for creating
+    # a test dataset (80% of the csv dataset for training,
+    # 20% for test)
+    dataset_list = os.listdir(labels_dir)
+    random.shuffle(dataset_list)
+    n_dataset = len(dataset_list)
+    split_idx = int(n_dataset*0.8)
+    training_list = dataset_list[:split_idx]
+    test_list = dataset_list[split_idx:]
+    
+
+
+    training_first_time = True
+    for file_name in training_list:
         curr_uf_csv = uf_dir+ '/'+ file_name
         curr_lables_csv = labels_dir + '/'+ file_name
         x_df = pd.read_csv(curr_uf_csv,usecols=unary_features)
         y_df = pd.read_csv(curr_lables_csv,dtype=int)
-        if first_time:
+        if training_first_time:
             x_train = x_df.to_numpy()
             y_train = y_df.to_numpy()
             y_train.shape = (y_train.shape[0],)
-            first_time = False
+            training_first_time = False
         else:
             x_curr = x_df.to_numpy()
             y_curr = y_df.to_numpy()
@@ -53,8 +65,26 @@ def load_dataset(settings):
     n_dim = x_train.shape[1]
     n_labels = np.amax(y_train)+1
 
-    x_test = x_train
-    y_test = y_train
+
+    test_first_time = True
+    for file_name in test_list:
+        curr_uf_csv = uf_dir+ '/'+ file_name
+        curr_lables_csv = labels_dir + '/'+ file_name
+        x_df = pd.read_csv(curr_uf_csv,usecols=unary_features)
+        y_df = pd.read_csv(curr_lables_csv,dtype=int)
+        if test_first_time:
+            x_test = x_df.to_numpy()
+            y_test = y_df.to_numpy()
+            y_test.shape = (y_test.shape[0],)
+            test_first_time = False
+        else:
+            x_curr = x_df.to_numpy()
+            y_curr = y_df.to_numpy()
+            y_curr.shape = (y_curr.shape[0],)
+            x_test = np.append(x_test,x_curr, axis=0)
+            y_test = np.append(y_test,y_curr, axis=0)
+
+    y_test.shape  = (y_test.shape[0],)
     n_test = x_test.shape[0]
 
     data = {'x_train': x_train, 'y_train': y_train, 'n_class': n_labels, \
