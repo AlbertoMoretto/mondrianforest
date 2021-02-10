@@ -464,8 +464,11 @@ def load_unary_features():
                     'bounding_box_depth', 'bounding_box_vertical_area', 'bounding_box_horizontal_area',
                     'vertical_elongation', 'horizontal_elongation', 'volumeness']
 
-    x_df = pd.read_csv('/home/alberto/tesi/dataset/trained_semseg_data/entangled_csv/unary_csv/0000.csv', usecols=unary_features)
-    y_df = pd.read_csv('/home/alberto/tesi/dataset/trained_semseg_data/entangled_csv/labels_csv/0000.csv', dtype=int)
+    uf_data_path = '../process_data/uf/unary_csv/'
+    labels_data_path = '../process_data/uf/labels_csv/'
+
+    x_df = pd.read_csv(uf_data_path+'0000.csv', usecols=unary_features)
+    y_df = pd.read_csv(labels_data_path+'0000.csv', dtype=int)
 
     x_train = x_df.to_numpy()
     y_train = y_df.to_numpy()
@@ -475,8 +478,13 @@ def load_unary_features():
     n_dim = x_train.shape[1]
     n_labels = np.amax(y_train)+1
 
-    x_test = x_train
-    y_test = y_train
+
+    x_test_df = pd.read_csv(uf_data_path+'0001.csv', usecols=unary_features)
+    y_test_df = pd.read_csv(labels_data_path+'0001.csv', dtype=int)
+
+    x_test = x_test_df.to_numpy()
+    y_test = y_test_df.to_numpy()
+    y_test.shape  = (y_test.shape[0],)
 
     n_test = x_test.shape[0]
 
