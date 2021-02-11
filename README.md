@@ -1,6 +1,5 @@
 This repo is forked from https://github.com/balajiln/mondrianforest .
 
-This folder contains the scripts used in the following papers:
 Install the following python packages 
 (and possibly other packages) to run the scripts:
 
