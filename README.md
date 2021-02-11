@@ -13,7 +13,7 @@ Some of the packages (e.g. pydot, matplotlib) are necessary only for '--draw_mon
 without plotting the Mondrians, these packages may not be necessary.
 To easily install the packages use 'pip install -r requirements.txt'.
 
-Help on usage for mondrian settings can be obtained by typing the following commands on the terminal:
+Help on usage of mondrian settings can be obtained by typing the following commands on terminal:
 
 ./mondrianforest.py -h
 
