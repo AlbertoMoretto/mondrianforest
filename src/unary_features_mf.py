@@ -40,7 +40,9 @@ def load_dataset(settings):
     test_list = dataset_list[split_idx:]
     
 
-
+    # Import the training dataset from csv files
+    # dividing unary features into x_train and
+    # labels into y_train
     training_first_time = True
     for file_name in training_list:
         curr_uf_csv = uf_dir+ '/'+ file_name
@@ -65,7 +67,9 @@ def load_dataset(settings):
     n_dim = x_train.shape[1]
     n_labels = np.amax(y_train)+1
 
-
+    # Import the test dataset from csv files
+    # dividing unary features into x_test and
+    # labels into y_test
     test_first_time = True
     for file_name in test_list:
         curr_uf_csv = uf_dir+ '/'+ file_name
@@ -108,27 +112,6 @@ def load_dataset(settings):
     except AttributeError:
         # backward compatibility with code without normalize_features argument
         pass
-    if settings.select_features:
-        if settings.optype == 'real':
-            scores, _ = feature_selection.f_regression(data['x_train'], data['y_train'])
-        else:
-            raise Exception('select_features currently supported only for regression')
-        scores[np.isnan(scores)] = 0.   # FIXME: setting nan scores to 0. Better alternative?
-        scores_sorted, idx_sorted = np.sort(scores), np.argsort(scores)
-        flag_relevant = scores_sorted > (scores_sorted[-1] * 0.05)  # FIXME: better way to set threshold? 
-        idx_feat_selected = idx_sorted[flag_relevant]
-        assert len(idx_feat_selected) >= 1
-        print scores
-        print scores_sorted
-        print idx_sorted
-        
-        if False:
-            data['x_train'] = data['x_train'][:, idx_feat_selected]
-            data['x_test'] = data['x_test'][:, idx_feat_selected]
-        else:
-            data['x_train'] = np.dot(data['x_train'], np.diag(scores)) 
-            data['x_test'] = np.dot(data['x_test'], np.diag(scores))
-        data['n_dim'] = data['x_train'].shape[1]
     # ------ beginning of hack ----------
     is_mondrianforest = True
     n_minibatches = settings.n_minibatches
